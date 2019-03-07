@@ -1,0 +1,6 @@
+[package]
+name = "operating_systems"
+version = "0.1.0"
+authors = ["Mieszko Wawrzyniak <kaaboaye@gmail.com>"]
+
+[dependencies]
