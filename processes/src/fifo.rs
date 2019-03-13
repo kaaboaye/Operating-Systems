@@ -1,13 +1,14 @@
 use std::collections::BTreeMap;
 
+use config::simulation_mode_config::SimulationModeConfig;
 use tasks::get_tasks;
 
-pub fn start() {
+pub fn start(config: SimulationModeConfig) {
     println!("Starting First in First out simulation");
 
     let tasks = get_tasks();
 
-    let mut state = State::new(tasks);
+    let mut state = State::new(config, tasks);
     state.run();
 
     println!("Simulation FINISHED");
@@ -20,18 +21,20 @@ pub fn start() {
 
 struct State {
     tasks: Box<BTreeMap<i64, Vec<i64>>>,
+    config: SimulationModeConfig,
     current_time: i64,
     waiting_time: i64,
     executed_tasks_amount: i64,
 }
 
 impl State {
-    fn new(tasks: Box<BTreeMap<i64, Vec<i64>>>) -> State {
+    fn new(config: SimulationModeConfig, tasks: Box<BTreeMap<i64, Vec<i64>>>) -> State {
         State {
             current_time: 0,
             waiting_time: 0,
             executed_tasks_amount: 0,
             tasks,
+            config,
         }
     }
 
@@ -54,12 +57,16 @@ impl State {
             {
                 let execution_time = tasks
                     .iter()
-                    .fold(0, |acc, &cost| acc + cost);
+                    .fold(0, |acc, &cost| acc + cost)
+                    + (self.config.process_boot_time + self.config.process_finish_time)
+                    * tasks.len() as i64;
 
                 self.current_time += execution_time;
 
                 // remember that first task in this queue will be executed right away
-                self.waiting_time += execution_time - *tasks.last().unwrap();
+                self.waiting_time += execution_time - *tasks.last().unwrap()
+                    + (self.config.process_boot_time + self.config.process_finish_time)
+                    * (tasks.len() as i64 - 1);
             }
 
             self.executed_tasks_amount += tasks.len() as i64;

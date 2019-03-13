@@ -1,13 +1,14 @@
 use std::collections::{BinaryHeap, BTreeMap};
 
+use config::simulation_mode_config::SimulationModeConfig;
 use tasks::{get_tasks, Task};
 
-pub fn start() {
+pub fn start(config: SimulationModeConfig) {
     println!("Starting Shortest Job First simulation");
 
     let tasks = get_tasks();
 
-    let mut state = State::new(tasks);
+    let mut state = State::new(config, tasks);
     state.run();
 
     println!("Simulation FINISHED");
@@ -20,6 +21,7 @@ pub fn start() {
 
 struct State {
     tasks: Box<BTreeMap<i64, Vec<i64>>>,
+    config: SimulationModeConfig,
     queue: BinaryHeap<Task>,
     current_time: i64,
     waiting_time: i64,
@@ -27,13 +29,14 @@ struct State {
 }
 
 impl State {
-    fn new(tasks: Box<BTreeMap<i64, Vec<i64>>>) -> State {
+    fn new(config: SimulationModeConfig, tasks: Box<BTreeMap<i64, Vec<i64>>>) -> State {
         State {
             current_time: 0,
             waiting_time: 0,
             executed_tasks_amount: 0,
             queue: BinaryHeap::new(),
             tasks,
+            config,
         }
     }
 
@@ -53,7 +56,10 @@ impl State {
                                  delay);
                         if delay > 0 { self.waiting_time += delay }
 
-                        self.current_time += task.cost;
+                        self.current_time += self.config.process_boot_time +
+                            task.cost +
+                            self.config.process_finish_time;
+
                         self.executed_tasks_amount += 1;
                     }
                 }
@@ -83,7 +89,10 @@ impl State {
                              delay);
                     if delay > 0 { self.waiting_time += delay }
 
-                    self.current_time += task.cost;
+                    self.current_time += self.config.process_boot_time +
+                        task.cost +
+                        self.config.process_finish_time;
+
                     self.executed_tasks_amount += 1;
                 }
             }
