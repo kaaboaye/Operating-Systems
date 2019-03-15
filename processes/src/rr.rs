@@ -6,7 +6,8 @@ use tasks::get_tasks;
 pub fn start(config: SimulationModeConfig) {
     println!("Starting Round-robin simulation");
 
-    let mut state = State::new(config, get_tasks());
+    let tasks = get_tasks(&config);
+    let mut state = State::new(config, tasks);
     state.run();
 
 
@@ -91,10 +92,45 @@ impl State {
                 self.queue.push_back(RunningTask { spawn_at, cost, initial_cost: cost });
             }
         }
+
+        // execute the rest of the queue
+        while self.queue.len() != 0 {
+            print(self);
+
+            for mut task in &mut self.queue {
+                // init new task
+                if task.cost == task.initial_cost {
+                    self.current_time += self.config.process_boot_time;
+                }
+
+                task.cost -= self.config.robin_time_window;
+                let minus_extra_time_left = if task.cost < 0 { task.cost } else { 0 };
+                let took = self.config.robin_time_window + minus_extra_time_left;
+
+                self.current_time += took + self.config.process_interruption_time;
+
+                // finish task if nothing is left to do
+                if task.cost <= 0 {
+                    self.executed_tasks_amount += 1;
+                    self.waiting_time += self.current_time - task.spawn_at - task.initial_cost;
+                    self.current_time += self.config.process_finish_time;
+                    continue;
+                }
+            }
+
+            self.queue = self.queue.iter()
+                .filter(|task| { task.cost > 0 })
+                .cloned()
+                .collect();
+        }
     }
 }
 
 fn print(ref state: &State) {
+    if !state.config.debug {
+        return;
+    }
+
     println!("‍🌈");
     println!("current_time: {}", state.current_time);
     println!("waiting_time: {}", state.waiting_time);

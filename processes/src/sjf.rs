@@ -6,7 +6,7 @@ use tasks::{get_tasks, Task};
 pub fn start(config: SimulationModeConfig) {
     println!("Starting Shortest Job First simulation");
 
-    let tasks = get_tasks();
+    let tasks = get_tasks(&config);
 
     let mut state = State::new(config, tasks);
     state.run();
@@ -48,12 +48,16 @@ impl State {
                     None => break,
                     Some(task) => {
                         let delay = self.current_time - task.spawn_at;
-                        println!("Evaluating task scheduled for {} at {} that will take {} ticks \
-                                    with {} delay",
-                                 task.spawn_at,
-                                 self.current_time,
-                                 task.cost,
-                                 delay);
+
+                        if self.config.debug {
+                            println!("Evaluating task scheduled for {} at {} that will take {}\
+                                    ticks with {} delay",
+                                     task.spawn_at,
+                                     self.current_time,
+                                     task.cost,
+                                     delay);
+                        }
+
                         if delay > 0 { self.waiting_time += delay }
 
                         self.current_time += self.config.process_boot_time +
@@ -81,12 +85,16 @@ impl State {
                 None => break,
                 Some(task) => {
                     let delay = self.current_time - task.spawn_at;
-                    println!("Evaluating task scheduled for {} at {} that will take {} ticks \
+
+                    if self.config.debug {
+                        println!("Evaluating task scheduled for {} at {} that will take {} ticks \
                                     with {} delay",
-                             task.spawn_at,
-                             self.current_time,
-                             task.cost,
-                             delay);
+                                 task.spawn_at,
+                                 self.current_time,
+                                 task.cost,
+                                 delay);
+                    }
+
                     if delay > 0 { self.waiting_time += delay }
 
                     self.current_time += self.config.process_boot_time +

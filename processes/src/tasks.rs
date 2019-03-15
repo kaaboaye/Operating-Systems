@@ -3,7 +3,9 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::process::exit;
 
-pub fn get_tasks() -> Box<BTreeMap<i64, Vec<i64>>> {
+use config::simulation_mode_config::SimulationModeConfig;
+
+pub fn get_tasks(ref config: &SimulationModeConfig) -> Box<BTreeMap<i64, Vec<i64>>> {
     let mut tree: Box<BTreeMap<i64, Vec<i64>>> = Box::new(BTreeMap::new());
 
     println!("Reading tasks");
@@ -12,12 +14,14 @@ pub fn get_tasks() -> Box<BTreeMap<i64, Vec<i64>>> {
         .expect("Something went wrong reading the file")
         .split("\n")
         .for_each(|line| {
+            if line == "" { return; }
+
             let nums: Vec<i64> = line
                 .split(',')
                 .map(|n| match n.parse() {
                     Ok(x) => x,
                     _ => {
-                        println!("TASKS HAVE BAD FORMAT");
+                        println!("TASKS field to parse integer '{}'", n);
                         exit(1);
                     }
                 })
@@ -28,6 +32,7 @@ pub fn get_tasks() -> Box<BTreeMap<i64, Vec<i64>>> {
                     .entry(*at)
                     .or_insert_with(Vec::new)
                     .push(*cost),
+
                 _ => {
                     println!("TASKS HAVE BAD FORMAT");
                     exit(1);
@@ -35,10 +40,11 @@ pub fn get_tasks() -> Box<BTreeMap<i64, Vec<i64>>> {
             };
         });
 
-
-    for (at, costs) in tree.iter() {
-        let s_costs: Vec<String> = costs.iter().map(|x| x.to_string()).collect();
-        println!("Task spawn at: {}, cost: {}", at, s_costs.as_slice().join(", "));
+    if config.debug {
+        for (at, costs) in tree.iter() {
+            let s_costs: Vec<String> = costs.iter().map(|x| x.to_string()).collect();
+            println!("Task spawn at: {}, cost: {}", at, s_costs.as_slice().join(", "));
+        }
     }
 
     println!("END OF TASKS");

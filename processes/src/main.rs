@@ -16,6 +16,11 @@ fn main() {
         Some(x) if x == "fifo" => fifo::start(config.fifo),
         Some(x) if x == "sjf" => sjf::start(config.sjf),
         Some(x) if x == "rr" => rr::start(config.rr),
+        Some(x) if x == "all" => {
+            fifo::start(config.fifo);
+            sjf::start(config.sjf);
+            rr::start(config.rr);
+        }
         _ => help(),
     }
 }

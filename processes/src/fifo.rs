@@ -6,7 +6,7 @@ use tasks::get_tasks;
 pub fn start(config: SimulationModeConfig) {
     println!("Starting First in First out simulation");
 
-    let tasks = get_tasks();
+    let tasks = get_tasks(&config);
 
     let mut state = State::new(config, tasks);
     state.run();

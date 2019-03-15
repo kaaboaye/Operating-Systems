@@ -11,9 +11,10 @@ impl SimulationConfig {
         let mode_conf = SimulationModeConfig {
             process_boot_time: 3,
             process_finish_time: 2,
-            process_interruption_time: 3,
-            robin_time_window: 30,
+            process_interruption_time: 30,
+            robin_time_window: 1000,
             processor_frequency: 3_000_000_000, // 3GHz
+            debug: false,
         };
 
         SimulationConfig {
