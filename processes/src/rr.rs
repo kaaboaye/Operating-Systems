@@ -1,10 +1,10 @@
 use std::collections::{BTreeMap, LinkedList};
 
 use config::simulation_mode_config::SimulationModeConfig;
-use tasks::get_tasks;
+use tasks::{get_tasks, RunningTask};
 
 pub fn start(config: SimulationModeConfig) {
-    println!("Starting Round-robin simulation");
+    println!("👀 Starting Round-robin simulation");
 
     let tasks = get_tasks(&config);
     let mut state = State::new(config, tasks);
@@ -17,13 +17,6 @@ pub fn start(config: SimulationModeConfig) {
     println!("\tTotal waiting time: {} ticks", state.waiting_time);
     println!("\tAverage waiting time: {} ticks",
              state.waiting_time as f64 / state.executed_tasks_amount as f64);
-}
-
-#[derive(Clone)]
-struct RunningTask {
-    spawn_at: i64,
-    cost: i64,
-    initial_cost: i64,
 }
 
 struct State {

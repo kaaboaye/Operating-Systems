@@ -9,11 +9,10 @@ pub struct SimulationConfig {
 impl SimulationConfig {
     pub fn new() -> SimulationConfig {
         let mode_conf = SimulationModeConfig {
-            process_boot_time: 3,
-            process_finish_time: 2,
-            process_interruption_time: 30,
-            robin_time_window: 1000,
-            processor_frequency: 3_000_000_000, // 3GHz
+            process_boot_time: 0,
+            process_finish_time: 0,
+            process_interruption_time: 0,
+            robin_time_window: 400,
             debug: false,
         };
 

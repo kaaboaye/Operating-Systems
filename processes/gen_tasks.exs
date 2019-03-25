@@ -1,7 +1,10 @@
 import Enum
 import IO
 
-1..1000
-|> map(fn _ -> "#{random(0..1_000_000)},#{random(10..1000)}" end)
-|> join("\n")
-|> puts()
+number_of_tasks = 10
+simulation_timespan = 10_000_000
+process_evaluation_cost = 10..100_000
+
+each(1..number_of_tasks, fn _ ->
+  puts("#{random(0..simulation_timespan)},#{random(process_evaluation_cost)}")
+end)

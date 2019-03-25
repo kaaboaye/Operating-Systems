@@ -53,6 +53,32 @@ pub fn get_tasks(ref config: &SimulationModeConfig) -> Box<BTreeMap<i64, Vec<i64
 }
 
 
+
+#[derive(Clone, Eq)]
+pub struct RunningTask {
+    pub spawn_at: i64,
+    pub cost: i64,
+    pub initial_cost: i64,
+}
+
+impl Ord for RunningTask {
+    fn cmp(&self, other: &RunningTask) -> Ordering {
+        self.cost.cmp(&-other.cost)
+    }
+}
+
+impl PartialOrd for RunningTask {
+    fn partial_cmp(&self, other: &RunningTask) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for RunningTask {
+    fn eq(&self, other: &RunningTask) -> bool {
+        self.cost == other.cost
+    }
+}
+
 #[derive(Eq)]
 pub struct Task {
     pub spawn_at: i64,

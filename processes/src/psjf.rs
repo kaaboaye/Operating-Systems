@@ -1,10 +1,10 @@
 use std::collections::{BinaryHeap, BTreeMap};
 
 use config::simulation_mode_config::SimulationModeConfig;
-use tasks::{get_tasks, Task};
+use tasks::{get_tasks, RunningTask};
 
 pub fn start(config: SimulationModeConfig) {
-    println!("👀 Starting Shortest Job First simulation");
+    println!("👀 Starting Preemptive Shortest Job First simulation");
 
     let tasks = get_tasks(&config);
 
@@ -22,7 +22,7 @@ pub fn start(config: SimulationModeConfig) {
 struct State {
     tasks: Box<BTreeMap<i64, Vec<i64>>>,
     config: SimulationModeConfig,
-    queue: BinaryHeap<Task>,
+    queue: BinaryHeap<RunningTask>,
     current_time: i64,
     waiting_time: i64,
     executed_tasks_amount: i64,
@@ -44,11 +44,15 @@ impl State {
         for (&spawn_at, costs) in self.tasks.iter() {
             // evaluate tasks in the queue until new tasks appear
             while self.current_time < spawn_at {
-                match self.queue.pop() {
+                match self.queue.peek_mut() {
                     None => break,
-                    Some(task) => {
-                        let delay = self.current_time - task.spawn_at;
+                    Some(mut task) => {
+                        if task.cost + self.current_time >= spawn_at {
+                            task.cost -= spawn_at - self.current_time;
+                            break;
+                        };
 
+                        let delay = self.current_time - task.spawn_at;
                         if self.config.debug {
                             println!("Evaluating task scheduled for {} at {} that will take {}\
                                     ticks with {} delay",
@@ -67,6 +71,8 @@ impl State {
                         self.executed_tasks_amount += 1;
                     }
                 }
+
+                self.queue.pop();
             }
 
             // skip unproductive waiting
@@ -76,7 +82,7 @@ impl State {
 
             // add new processes to the execution queue
             for &cost in costs {
-                self.queue.push(Task { spawn_at, cost })
+                self.queue.push(RunningTask { spawn_at, cost, initial_cost: cost })
             }
         };
 

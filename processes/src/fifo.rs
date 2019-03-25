@@ -4,7 +4,7 @@ use config::simulation_mode_config::SimulationModeConfig;
 use tasks::get_tasks;
 
 pub fn start(config: SimulationModeConfig) {
-    println!("Starting First in First out simulation");
+    println!("👀 Starting First in First out simulation");
 
     let tasks = get_tasks(&config);
 
