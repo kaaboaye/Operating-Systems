@@ -113,7 +113,7 @@ export class ConfigView extends React.Component<{}, Config> {
           onClick={this.generateInputData}
           style={buttonStyles}
         >
-          Generuj dane
+          Generate input data
         </Button>
 
         <Button
@@ -122,7 +122,7 @@ export class ConfigView extends React.Component<{}, Config> {
           onClick={this.reset}
           style={buttonStyles}
         >
-          Resetuj dane
+          Restore configuration
         </Button>
 
         <TextField
