@@ -3,7 +3,7 @@ export interface Dictionary<T> {
 }
 
 type Accumulator<T> = [T, number];
-export type Callback<T> = (x: T) => number;
+export type Callback<T, Y = number> = (x: T) => Y;
 
 export function cmpBy<T>(
   collection: ReadonlyArray<T>,
@@ -39,4 +39,15 @@ export function maxBy<T>(
   callback: Callback<T>
 ): T {
   return cmpBy(collection, (a, b) => a > b, callback);
+}
+
+export function count<T>(
+  collection: ReadonlyArray<T>,
+  callback: Callback<T, boolean> = x => !!x
+): number {
+  return Array.prototype.reduce.call(
+    collection,
+    ((acc: number, x: T) => (callback(x) ? acc + 1 : acc)) as any,
+    0
+  ) as any;
 }
