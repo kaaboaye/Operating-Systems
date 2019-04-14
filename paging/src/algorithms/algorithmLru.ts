@@ -1,5 +1,5 @@
 import { PagingAlgorithm } from "../lib/algorithm";
-import { maxBy } from "../lib";
+import { minBy } from "../lib";
 
 export const algorithmLru: PagingAlgorithm = config => {
   const memoryState: Array<number | null> = Object.seal(
@@ -20,9 +20,9 @@ export const algorithmLru: PagingAlgorithm = config => {
       return { memoryState: memoryState.slice(), hit: false };
     }
 
-    const { idx: indexToOverride } = maxBy(
+    const { idx: indexToOverride } = minBy(
       [...memoryAgeMap.values()],
-      ({ uses: age }) => age
+      ({ uses }) => uses
     );
 
     memoryAgeMap.delete(memoryState[indexToOverride]!);
