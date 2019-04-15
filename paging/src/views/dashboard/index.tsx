@@ -12,6 +12,7 @@ import { algorithmFifo } from "../../algorithms/algorithmFifo";
 import { algorithmOpt } from "../../algorithms/algorithmOpt";
 import { algorithmLru } from "../../algorithms/algorithmLru";
 import { algorithmRand } from "../../algorithms/algorithmRand";
+import { algorithmAlru } from "../../algorithms/algorithmAlru";
 
 interface DashboardViewAlgorithmsState {
   fifo: AlgorithmResult;
@@ -53,8 +54,13 @@ class DashboardView extends React.Component<{}, Partial<DashboardViewState>> {
     },
     {
       name: "LRU",
-      state: "fifo",
+      state: "lru",
       algorithm: algorithmLru
+    },
+    {
+      name: "ALRU",
+      state: "arlu",
+      algorithm: algorithmAlru
     },
     {
       name: "RAND",

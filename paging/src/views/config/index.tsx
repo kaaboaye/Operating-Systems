@@ -40,7 +40,8 @@ export class ConfigView extends React.Component<{}, Config> {
           return event.target.value.split("\n").map(x => {
             const str = event.target.value.replace(/\D/g, "");
             const num = Number.parseInt(str);
-            return Number.isFinite(num) ? num : 0;
+            const pageNo = Number.isFinite(num) ? num : 0;
+            return { pageNo };
           });
         }
 
@@ -110,8 +111,8 @@ export class ConfigView extends React.Component<{}, Config> {
 
         <TextField
           label="Input data"
-          name="inputData:intArray"
-          value={this.state.inputTasks.map(t => t.pageNo.toString()).join("\n")}
+          name="inputTasks:intArray"
+          value={this.state.inputTasks.map(t => t.pageNo).join("\n")}
           onChange={this.handleChange}
           multiline
           style={formStyles}

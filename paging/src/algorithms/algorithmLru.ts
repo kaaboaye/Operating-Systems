@@ -9,7 +9,7 @@ export const algorithmLru: PagingAlgorithm = config => {
 
   const rows = config.inputTasks.map(({ pageNo }) => {
     if (memoryAgeMap.has(pageNo)) {
-      memoryAgeMap.get(pageNo)!.uses++;
+      const page = memoryAgeMap.get(pageNo)!.uses++;
       return { memoryState: memoryState.slice(), hit: true };
     }
 
