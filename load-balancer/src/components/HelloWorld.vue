@@ -1,147 +1,256 @@
 <template>
-  <v-container>
-    <v-layout
-      text-xs-center
-      wrap
-    >
+  <div class="worker">
+    <v-layout text-xs-center wrap>
+      <v-flex xs12 mb-5 style="padding: 1em">
+        <v-text-field
+          v-model.number="workersAmount"
+          label="Number of workers"
+          type="number"
+          required
+        />
+        <v-text-field
+          v-model.number="tasksAmount"
+          label="Number of tasks"
+          type="number"
+          required
+        />
+
+        <v-dialog v-model="workersDialog" width="500">
+          <template v-slot:activator="{ on }">
+            <v-btn color="primary lighten-2" dark v-on="on"
+              >Configure workers</v-btn
+            >
+          </template>
+
+          <v-card style="padding: 1em">
+            <v-text-field
+              v-for="worker in workers"
+              :key="worker.id"
+              :label="`#${worker.id}`"
+              v-model.number="worker.speed"
+              number
+              required
+              value="0"
+            />
+          </v-card>
+        </v-dialog>
+
+        <v-btn @click="generateWorkers">Generate workers</v-btn>
+
+        <v-dialog v-model="tasksDialog" width="500">
+          <template v-slot:activator="{ on }">
+            <v-btn color="primary lighten-2" dark v-on="on"
+              >Configure tasks</v-btn
+            >
+          </template>
+
+          <v-card style="padding: 1em">
+            <p>{{ tasks }}</p>
+          </v-card>
+        </v-dialog>
+
+        <v-btn @click="generateTasks">Generate tasks</v-btn>
+
+        <v-btn color="primary" @click="rand">rand</v-btn>
+        <v-btn color="primary" @click="robin">robin</v-btn>
+        <v-btn color="primary" @click="alg1">alg1</v-btn>
+        <v-btn color="primary" @click="alg2">alg2</v-btn>
+        <v-btn color="primary" @click="alg3">alg3</v-btn>
+        Average load: {{ averageLoad }}%
+      </v-flex>
+
       <v-flex xs12>
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        ></v-img>
-      </v-flex>
-
-      <v-flex mb-4>
-        <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to Vuetify
-        </h1>
-        <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br>please join our online
-          <a href="https://community.vuetifyjs.com" target="_blank">Discord Community</a>
-        </p>
-      </v-flex>
-
-      <v-flex
-        mb-5
-        xs12
-      >
-        <h2 class="headline font-weight-bold mb-3">What's next?</h2>
-
-        <v-layout justify-center>
-          <a
-            v-for="(next, i) in whatsNext"
-            :key="i"
-            :href="next.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ next.text }}
-          </a>
-        </v-layout>
-      </v-flex>
-
-      <v-flex
-        xs12
-        mb-5
-      >
-        <h2 class="headline font-weight-bold mb-3">Important Links</h2>
-
-        <v-layout justify-center>
-          <a
-            v-for="(link, i) in importantLinks"
-            :key="i"
-            :href="link.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ link.text }}
-          </a>
-        </v-layout>
-      </v-flex>
-
-      <v-flex
-        xs12
-        mb-5
-      >
-        <h2 class="headline font-weight-bold mb-3">Ecosystem</h2>
-
-        <v-layout justify-center>
-          <a
-            v-for="(eco, i) in ecosystem"
-            :key="i"
-            :href="eco.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ eco.text }}
-          </a>
-        </v-layout>
+        <div class="text-xs-center">
+          <Worker
+            v-for="worker in workers"
+            :key="worker.id"
+            :worker="worker"
+            :capacity="capacity"
+          />
+        </div>
       </v-flex>
     </v-layout>
-  </v-container>
+  </div>
 </template>
 
 <script>
-  export default {
-    data: () => ({
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader'
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify'
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify'
-        }
-      ],
-      importantLinks: [
-        {
-          text: 'Documentation',
-          href: 'https://vuetifyjs.com'
-        },
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com'
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuetifyjs.com'
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs'
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify'
-        }
-      ],
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer'
-        },
-        {
-          text: 'Select a layout',
-          href: 'https://vuetifyjs.com/layout/pre-defined'
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions'
-        }
+import Worker from "./Worker.vue";
 
-      ]
-    })
+function randomInt(x) {
+  return Math.floor(Math.random() * x);
+}
+
+export default {
+  components: { Worker },
+
+  data() {
+    return {
+      workersAmount: 30,
+      workersDialog: false,
+      workers: [],
+      tasksDialog: false,
+      tasksAmount: 1000,
+      tasks: [],
+      lastUsedMethod: "rand"
+    };
+  },
+
+  created() {
+    this.generateWorkers(true);
+    this.generateTasks(true);
+    this[this.lastUsedMethod]();
+  },
+
+  watch: {
+    workersAmount(workersAmount) {
+      workersAmount = Number.parseInt(workersAmount) || 0;
+
+      if (2 > workersAmount && workersAmount >= 500) return;
+      this.generateWorkers();
+    },
+
+    tasksAmount() {
+      this.generateTasks();
+    }
+  },
+
+  computed: {
+    capacity() {
+      return Math.max.apply(Math, this.workers.map(w => w.load));
+    },
+
+    averageLoad() {
+      const capacity = this.capacity;
+      const load =
+        (this.workers
+          .map(w => w.load / capacity)
+          .reduce((acc, l) => acc + l, 0) /
+          this.workers.length) *
+        100;
+
+      return Math.round(load);
+    }
+  },
+
+  methods: {
+    generateWorkers(stopSimulation) {
+      this.workers = new Array(this.workersAmount)
+        .fill(null)
+        .map((_, id) => ({ id, load: 0, speed: Math.random() / 2 + 0.5 }));
+
+      if (stopSimulation !== true) this[this.lastUsedMethod]();
+    },
+
+    generateTasks(stopSimulation) {
+      this.tasks = new Array(this.tasksAmount)
+        .fill(null)
+        .map(() => Math.floor(Math.random() * 3000));
+
+      if (stopSimulation !== true) this[this.lastUsedMethod]();
+    },
+
+    resetWorkers() {
+      this.workers.forEach(worker => (worker.load = 0));
+    },
+
+    rand() {
+      this.resetWorkers();
+      this.lastUsedMethod = "rand";
+
+      this.tasks.forEach(task => {
+        const worker = this.workers[randomInt(this.workers.length)];
+        worker.load += task / worker.speed;
+      });
+    },
+
+    robin() {
+      this.resetWorkers();
+      this.lastUsedMethod = "robin";
+
+      let lastWorker = 0;
+
+      this.tasks.forEach(task => {
+        const worker = (() => {
+          for (let i = 0; i < 0.1 * this.workersAmount + 1; i++) {
+            const worker = this.workers[lastWorker];
+            lastWorker = (lastWorker + 1) % this.workersAmount;
+            if (worker.load < 0.95 * this.capacity) {
+              return worker;
+            }
+          }
+          const worker = this.workers[lastWorker];
+          lastWorker = (lastWorker + 1) % this.workersAmount;
+          return worker;
+        })();
+
+        worker.load += task / worker.speed;
+      });
+    },
+
+    alg1() {
+      this.resetWorkers();
+      this.lastUsedMethod = "alg1";
+
+      this.tasks.forEach(task => {
+        const worker = (() => {
+          for (let i = 0; i < 0.1 * this.workersAmount + 1; i++) {
+            const worker = this.workers[randomInt(this.workers.length - 1) + 1];
+            if (worker.load < 0.95 * this.capacity) {
+              return worker;
+            }
+          }
+          return this.workers[0];
+        })();
+
+        worker.load += task / worker.speed;
+      });
+    },
+
+    alg2() {
+      this.resetWorkers();
+      this.lastUsedMethod = "alg2";
+
+      this.tasks.forEach(task => {
+        const worker = (() => {
+          if (this.workers[0].load < 0.5 * this.capacity) {
+            return this.workers[0];
+          }
+
+          for (let i = 0; i < 0.1 * this.workersAmount + 1; i++) {
+            const worker = this.workers[randomInt(this.workers.length - 1) + 1];
+            if (worker.load < 0.95 * this.capacity) {
+              return worker;
+            }
+          }
+          return this.workers[0];
+        })();
+
+        worker.load += task / worker.speed;
+      });
+    },
+
+    alg3() {
+      this.resetWorkers();
+      this.lastUsedMethod = "alg3";
+
+      this.tasks.forEach(task => {
+        const worker = (() => {
+          if (this.workers[0].load < 0.5 * this.capacity) {
+            return this.workers[0];
+          }
+
+          for (let i = 0; i < 0.1 * this.workersAmount + 1; i++) {
+            const worker = this.workers[randomInt(this.workers.length - 1) + 1];
+            if (worker.load < 0.95 * this.capacity) {
+              return worker;
+            }
+          }
+          return this.workers[0];
+        })();
+
+        worker.load += task / worker.speed;
+      });
+    }
   }
+};
 </script>
-
-<style>
-
-</style>
