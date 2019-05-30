@@ -8,18 +8,11 @@
           type="number"
           required
         />
-        <v-text-field
-          v-model.number="tasksAmount"
-          label="Number of tasks"
-          type="number"
-          required
-        />
+        <v-text-field v-model.number="tasksAmount" label="Number of tasks" type="number" required/>
 
         <v-dialog v-model="workersDialog" width="500">
           <template v-slot:activator="{ on }">
-            <v-btn color="primary lighten-2" dark v-on="on"
-              >Configure workers</v-btn
-            >
+            <v-btn color="primary lighten-2" dark v-on="on">Configure workers</v-btn>
           </template>
 
           <v-card style="padding: 1em">
@@ -39,9 +32,7 @@
 
         <v-dialog v-model="tasksDialog" width="500">
           <template v-slot:activator="{ on }">
-            <v-btn color="primary lighten-2" dark v-on="on"
-              >Configure tasks</v-btn
-            >
+            <v-btn color="primary lighten-2" dark v-on="on">Configure tasks</v-btn>
           </template>
 
           <v-card style="padding: 1em">
@@ -61,12 +52,7 @@
 
       <v-flex xs12>
         <div class="text-xs-center">
-          <Worker
-            v-for="worker in workers"
-            :key="worker.id"
-            :worker="worker"
-            :capacity="capacity"
-          />
+          <Worker v-for="worker in workers" :key="worker.id" :worker="worker" :capacity="capacity"/>
         </div>
       </v-flex>
     </v-layout>

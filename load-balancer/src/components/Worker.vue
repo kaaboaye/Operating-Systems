@@ -7,9 +7,10 @@
       :value="(100 * worker.load) / capacity"
       color="teal"
       style="margin: 1em"
-      >#{{ worker.id }}
-      {{ Math.round((100 * worker.load) / capacity) }}%</v-progress-circular
     >
+      #{{ worker.id + 1 }}
+      {{ Math.round((100 * worker.load) / capacity) }}%
+    </v-progress-circular>
   </span>
 </template>
 
